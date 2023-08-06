@@ -37,66 +37,87 @@ operations.
 ///output : before ,after and Res:3
 //***************************************************************************************** */
 
-const cache = new Map();
-function inconsistentRead(filename, cb) {
-  console.log(`${filename}`);
-  if (cache.has(filename)) {
-    console.log(`////////////////////////////////`);
-    console.log("sync");
+//*************************************************************************************************************
+// const cache = new Map();
+// function inconsistentRead(filename, cb) {
+//   console.log(`${filename}`);
+//   if (cache.has(filename)) {
+//     console.log(`////////////////////////////////`);
+//     console.log("sync");
 
-    // invoked synchronously
-    console.log(`cahed: `);
-    console.log(`value is cahed ${cache.get(filename)}`);
-    cb(cache.get(filename));
-    console.log(`////////////////////////////////`);
-  } else {
-    // asynchronous function
-    console.log(`////////////////////////////////`);
-    console.log("async");
+// invoked synchronously
+//     console.log(`cahed: `);
+//     console.log(`value is cahed ${cache.get(filename)}`);
+//     cb(cache.get(filename));
+//     console.log(`////////////////////////////////`);
+//   } else {
+// asynchronous function
+//     console.log(`////////////////////////////////`);
+//     console.log("async");
 
-    fs.readFile(filename, "utf8", (err, data) => {
-      cache.set(filename, data);
-      console.log(`${cache.get(filename)}`);
-      console.log(`${data}`);
-      cb(data);
-      console.log("///////////////////////////////////////////");
-    });
-  }
-}
+//     fs.readFile(filename, "utf8", (err, data) => {
+//       cache.set(filename, data);
+//       console.log(`${cache.get(filename)}`);
+//       console.log(`${data}`);
+//       cb(data);
+//       console.log("///////////////////////////////////////////");
+//     });
+//   }
+// }
 
-function createFileReader(filename) {
-  const listeners = [];
-  inconsistentRead(filename, (value) => {
-    console.log(`values: ${value}`);
-    listeners.forEach((listener) => listener(value));
-  });
+// function createFileReader(filename) {
+//   const listeners = [];
+//   inconsistentRead(filename, (value) => {
+//     console.log(`values: ${value}`);
+//     listeners.forEach((listener) => listener(value));
+//   });
 
-  return { onDataReady: (listener) => listeners.push(listener) };
-}
+//   return { onDataReady: (listener) => listeners.push(listener) };
+// }
 
 // During the creation of reader1, our inconsistentRead() function behaves
 // asynchronously because there is no cached result available. This means that
 // any onDataReady listener will be invoked later in another cycle of the event
 // loop, so we have all the time we need to register our listener.
 
-console.log("aync");
-const reader1 = createFileReader("data.text");
-reader1.onDataReady((data) => {
-  console.log(`First call data: ${data}`);
-});
+// console.log("aync");
+// const reader1 = createFileReader("data.text");
+// reader1.onDataReady((data) => {
+//   console.log(`First call data: ${data}`);
+// });
 //ouput is :First call data: some data
 
-console.log("sync");
-const reader2 = createFileReader("data.txt");
-reader2.onDataReady((data) => {
-  console.log(`Second call data: ${data}`);
-});
+// console.log("sync");
+// const reader2 = createFileReader("data.txt");
+// reader2.onDataReady((data) => {
+//   console.log(`Second call data: ${data}`);
+// });
 
 /// output :undifiend
 
 //to solve this problem you can add proccess.nextick in out funtion which
 //defers the execution of a function after the currently running operation completes
-if (cache.has(filename)) {
-  // deferred callback invocation
-  process.nextTick(() => callback(cache.get(filename)));
-}
+//if (cache.has(filename)) {
+// deferred callback invocation
+//   process.nextTick(() => callback(cache.get(filename)));
+// }
+
+/*******************************************************************************************************************/
+
+//what the different between process.nextTick ,setimmediate ,setTimeout
+// process.nextTick is processed at the starting of the event loop and between each phase of the event loop. and if it in recrusive is blocked another methods in eventloop
+//setimmediate is processed in the Check handlers phase
+
+// setImmediate(() => console.log("I run immediately"));
+// process.nextTick(() => console.log("But I run before that,"));
+//output :But I run before that, I run immediately
+//*********************************************************************************************************************** */
+///*********************************************************** */
+process.on("uncaughtException", (err) => {
+  console.error(`This will catch at last the JSON parsing exception:
+    ${err.message}`);
+  // Terminates the application with 1 (error) as exit code.
+  // Without the following line, the application would continue
+  process.exit(1);
+});
+/***************************************************** */
