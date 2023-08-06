@@ -59,6 +59,7 @@ function createFileReader(filename) {
     console.log(`values: ${value}`);
     listeners.forEach((listener) => listener(value));
   });
+
   return { onDataReady: (listener) => listeners.push(listener) };
 }
 
