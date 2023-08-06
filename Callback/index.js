@@ -1,6 +1,17 @@
 const fs = require("fs");
 
-/// callBack is just funtion invoked in runtime and this notifiy that the async fun is completed
+/*
+the callBack 
+1=>is just funtion invoked in runtime and this notifiy that the async fun is completed
+2=>function is really unpredictable as it depends on many factors, such as the frequency of its invocation, the filename
+passed as an argument, and the amount of time taken to load the file.
+
+3=>Always choose a direct style for purely synchronous functions for no using cps
+4=>Use blocking APIs sparingly and only when they don't affect
+the ability of the application to handle concurrent asynchronous
+operations.
+
+*/
 
 //********************************************************************* */
 // this is cps contnuation passing style
@@ -73,9 +84,19 @@ const reader1 = createFileReader("data.text");
 reader1.onDataReady((data) => {
   console.log(`First call data: ${data}`);
 });
+//ouput is :First call data: some data
 
 console.log("sync");
 const reader2 = createFileReader("data.txt");
 reader2.onDataReady((data) => {
   console.log(`Second call data: ${data}`);
 });
+
+/// output :undifiend
+
+//to solve this problem you can add proccess.nextick in out funtion which
+//defers the execution of a function after the currently running operation completes
+if (cache.has(filename)) {
+  // deferred callback invocation
+  process.nextTick(() => callback(cache.get(filename)));
+}
